@@ -1,0 +1,405 @@
+﻿
+@using System
+@using System.Collections.Generic
+@using System.Web.Mvc
+
+@{
+    ViewBag.Title = "Chọn bác sĩ";
+    Layout = null;
+
+    // Danh sách bác sĩ lấy từ SQL Server
+    var danhSach = ViewBag.DanhSach as List<SelectListItem>
+                   ?? new List<SelectListItem>();
+
+    // Chuyên khoa đã chọn
+    string tenKhoa = Convert.ToString(
+        ViewBag.TenKhoa ?? "Chuyên khoa");
+
+    // Mã bác sĩ đã chọn
+    string maBacSiDaChon = Convert.ToString(
+        Session["MaBacSi"] ?? "");
+
+    // Nội dung giới thiệu mẫu cho đồ án
+    string[] gioiThieu = {
+        "Tư vấn và hỗ trợ thăm khám các vấn đề sức khỏe thuộc chuyên khoa.",
+        "Lắng nghe nhu cầu khám bệnh và hướng dẫn quy trình thăm khám.",
+        "Hỗ trợ đánh giá triệu chứng và tư vấn các bước kiểm tra phù hợp.",
+        "Tư vấn chăm sóc sức khỏe và hướng dẫn theo dõi sau khi khám.",
+        "Hỗ trợ người bệnh trong quá trình khám và tư vấn sức khỏe."
+    };
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1" />
+
+    <title>Danh sách bác sĩ - eHealthCare</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f2f4f4;
+            font-family: Arial, sans-serif;
+            color: #344054;
+        }
+
+        /* THANH ĐẦU TRANG */
+        .header {
+            background: #087a9b;
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+        }
+
+            .header h1 {
+                font-size: 32px;
+                margin: 0;
+            }
+
+            .header p {
+                margin-top: 10px;
+                font-size: 15px;
+            }
+
+        /* KHU VỰC NỘI DUNG */
+        .container {
+            width: 94%;
+            max-width: 1300px;
+            margin: 35px auto;
+        }
+
+        .page-title {
+            text-align: center;
+            color: #087a9b;
+            font-size: 30px;
+            margin-bottom: 12px;
+        }
+
+        .description {
+            text-align: center;
+            color: #667788;
+            margin-bottom: 30px;
+        }
+
+        /* DANH SÁCH BÁC SĨ */
+        .doctor-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px 20px;
+        }
+
+        /* THẺ BÁC SĨ */
+        .doctor-card {
+            background: white;
+            padding: 14px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid transparent;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+            transition: 0.2s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+            .doctor-card:hover {
+                border-color: #1595e6;
+                transform: translateY(-3px);
+            }
+
+            .doctor-card.selected {
+                border-color: #087a9b;
+            }
+
+        /* HÌNH BÁC SĨ */
+        .doctor-image {
+            width: 100%;
+            height: 270px;
+            object-fit: cover;
+            display: block;
+            border-radius: 5px;
+            background: #e8f2f8;
+        }
+
+        /* CHUYÊN KHOA */
+        .specialty {
+            color: #00a9b7;
+            font-size: 15px;
+            margin-top: 17px;
+            margin-bottom: 9px;
+        }
+
+        /* HỌ TÊN BÁC SĨ */
+        .doctor-name {
+            color: #344054;
+            font-size: 16px;
+            font-weight: 600;
+            line-height: 1.5;
+            text-transform: uppercase;
+            min-height: 48px;
+            margin: 0;
+        }
+
+        /* GIỚI THIỆU */
+        .doctor-bio {
+            color: #667788;
+            font-size: 13px;
+            line-height: 1.6;
+            margin: 12px 0;
+            flex-grow: 1;
+        }
+
+        .demo-note {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-bottom: 12px;
+        }
+
+        /* NÚT CHỌN */
+        .btn-select {
+            width: 100%;
+            padding: 12px;
+            background: #087a9b;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+            .btn-select:hover {
+                background: #06637e;
+            }
+
+        /* THÔNG BÁO */
+        .success {
+            background: #e5f7ec;
+            color: #17663b;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 22px;
+            text-align: center;
+        }
+
+        .error {
+            background: #fff0ef;
+            color: #a52c2c;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 22px;
+            text-align: center;
+        }
+
+        .selected-label {
+            color: #087a9b;
+            font-weight: bold;
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+
+        .empty {
+            background: white;
+            padding: 35px;
+            text-align: center;
+            border-radius: 10px;
+            color: #667788;
+        }
+
+        .back {
+            display: block;
+            text-align: center;
+            color: #087a9b;
+            margin: 35px auto;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* RESPONSIVE */
+        @@media (max-width: 1050px) {
+            .doctor-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @@media (max-width: 750px) {
+            .doctor-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+
+            .doctor-image {
+                height: 220px;
+            }
+        }
+
+        @@media (max-width: 480px) {
+            .doctor-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .doctor-image {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="header">
+        <h1>✚ eHealthCare</h1>
+        <p>Hệ thống đăng ký khám bệnh trực tuyến</p>
+    </header>
+
+    <main class="container">
+
+        <h2 class="page-title">
+            DANH SÁCH BÁC SĨ
+        </h2>
+
+        <p class="description">
+            Chuyên khoa: <strong>@tenKhoa</strong>
+        </p>
+
+        <!-- THÔNG BÁO -->
+        @if (ViewBag.ThongBao != null)
+        {
+            <div class="success">
+                @ViewBag.ThongBao
+            </div>
+        }
+
+        @if (ViewBag.Error != null)
+        {
+            <div class="error">
+                @ViewBag.Error
+            </div>
+        }
+
+        <!-- HIỂN THỊ DANH SÁCH BÁC SĨ -->
+        @if (danhSach.Count > 0)
+        {
+            <div class="doctor-grid">
+
+                @for (int i = 0; i < danhSach.Count; i++)
+                {
+                    var bacSi = danhSach[i];
+
+                    // Tạm sử dụng luân phiên hình nam và nữ
+                    string hinhBacSi =
+                        (i % 2 == 0)
+                        ? "doctorNam.png"
+                        : "doctorNu.png";
+
+                    string noiDungGioiThieu =
+                        gioiThieu[i % gioiThieu.Length];
+
+                    bool daChon =
+                        bacSi.Value == maBacSiDaChon;
+
+                    <article class="doctor-card @(daChon ? "selected" : "")">
+
+                        <!-- HÌNH ẢNH -->
+                        <img src="@Url.Content("~/Content/Images/" + hinhBacSi)"
+                             alt="Hình minh họa bác sĩ"
+                             class="doctor-image" />
+
+                        <!-- CHUYÊN KHOA -->
+                        <div class="specialty">
+                            @tenKhoa
+                        </div>
+
+                        <!-- TÊN BÁC SĨ -->
+                        <h3 class="doctor-name">
+                            @bacSi.Text
+                        </h3>
+
+                        <!-- GIỚI THIỆU -->
+                        <p class="doctor-bio">
+                            @noiDungGioiThieu
+                        </p>
+
+
+
+                        @if (daChon)
+                        {
+                            <div class="selected-label">
+                                ✓ Bác sĩ đã chọn
+                            </div>
+                        }
+
+                        <!-- FORM CHỌN BÁC SĨ -->
+                        <form method="post"
+                              action="@Url.Action("ChonBacSi", "KhamBenh")">
+
+                            @Html.AntiForgeryToken()
+
+                            <input type="hidden"
+                                   name="ma_bs"
+                                   value="@bacSi.Value" />
+
+                            <button type="submit"
+                                    class="btn-select"
+                                    onclick="this.disabled=true; this.innerText='Đang xử lý...'; this.form.submit();">
+                                Lấy số khám
+                            </button>
+
+                        </form>
+
+                    </article>
+                }
+
+            </div>
+        }
+        else
+        {
+            <div class="empty">
+                <h3>Hiện không có bác sĩ đang trực</h3>
+                <p>
+                    Chuyên khoa này hiện chưa có bác sĩ
+                    trong ca trực đang diễn ra.
+                </p>
+
+
+            </div>
+        }
+
+        <!-- QUAY LẠI -->
+        <a class="back"
+           href="@Url.Action("ChonKhoa", "KhamBenh")">
+            ← Quay lại chọn chuyên khoa
+        </a>
+
+    </main>
+
+    <div style="text-align:right; padding:12px 25px;">
+        @using (Html.BeginForm(
+            "DangXuat",
+            "Account",
+            FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+
+            <button type="submit"
+                    style="background:#d9534f;
+                       color:white;
+                       border:none;
+                       padding:10px 20px;
+                       border-radius:6px;
+                       cursor:pointer;">
+                Đăng xuất
+            </button>
+        }
+    </div>
+
+</body>
+</html>

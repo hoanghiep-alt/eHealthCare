@@ -1,0 +1,297 @@
+﻿@model eHealthCare.Controllers.KeDonViewModel
+@using System
+@using System.Linq
+
+@{
+    ViewBag.Title = "Kê đơn thuốc";
+    Layout = null;
+    decimal tongTamTinh = Model.ChiTiet.Sum(x => x.DonGia * x.SoLuong);
+    bool coTheThem = Model.ChoPhepThemThuoc;
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Kê đơn thuốc - eHealthCare</title>
+    <style>
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            font: 15px Arial,sans-serif;
+            color: #243e52;
+            background: #f0f5f8
+        }
+
+        header {
+            background: #087a9b;
+            color: #fff;
+            padding: 23px 5%
+        }
+
+            header h1 {
+                margin: 0 0 6px;
+                font-size: 25px
+            }
+
+            header p {
+                margin: 0;
+                font-size: 13px
+            }
+
+        main {
+            max-width: 1000px;
+            width: 94%;
+            margin: 28px auto
+        }
+
+        section {
+            background: white;
+            border-radius: 14px;
+            padding: 25px;
+            margin-bottom: 18px;
+            box-shadow: 0 3px 15px rgba(0,0,0,.045)
+        }
+
+        h2 {
+            font-size: 24px;
+            color: #087a9b;
+            margin: 0 0 16px
+        }
+
+        h3 {
+            margin: 0 0 18px;
+            font-size: 19px
+        }
+
+        .info {
+            display: grid;
+            grid-template-columns: repeat(2,minmax(0,1fr));
+            gap: 12px
+        }
+
+            .info div {
+                padding: 14px;
+                border-radius: 9px;
+                background: #f2f8fb
+            }
+
+            .info small {
+                display: block;
+                margin-bottom: 6px;
+                color: #667e8c
+            }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin: 0 0 7px
+        }
+
+        input, select {
+            border: 1px solid #b9cfd9;
+            border-radius: 8px;
+            background: #fff;
+            padding: 11px;
+            width: 100%;
+            font: inherit;
+            min-height: 42px
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2,minmax(0,1fr));
+            gap: 15px
+        }
+
+        .field {
+            margin: 0 0 15px
+        }
+
+        .button {
+            border: 0;
+            border-radius: 8px;
+            background: #087a9b;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 13px 22px;
+            font-size: 15px;
+            text-decoration: none;
+            display: inline-block
+        }
+
+            .button[disabled] {
+                background: #96aeb8;
+                cursor: not-allowed
+            }
+
+        .link {
+            color: #087a9b;
+            text-decoration: none;
+            font-weight: bold
+        }
+
+        .success {
+            padding: 14px;
+            border-radius: 9px;
+            color: #17663b;
+            background: #e5f7ec;
+            margin-bottom: 16px
+        }
+
+        .error {
+            padding: 14px;
+            border-radius: 9px;
+            color: #a12828;
+            background: #fff0ef;
+            margin-bottom: 16px
+        }
+
+        table {
+            width: 100%;
+            min-width: 620px;
+            border-collapse: collapse
+        }
+
+        th {
+            text-align: left;
+            background: #e8f5fa;
+            color: #087a9b
+        }
+
+        td, th {
+            padding: 12px;
+            border-bottom: 1px solid #e7eef2
+        }
+
+        .scroll {
+            overflow-x: auto
+        }
+
+        .hint {
+            font-size: 13px;
+            color: #627787;
+            line-height: 1.6
+        }
+
+        .total {
+            font-weight: bold;
+            text-align: right;
+            color: #087a9b;
+            margin-top: 15px
+        }
+
+        @@media(max-width:650px) {
+            .grid, .info {
+                grid-template-columns: 1fr
+            }
+
+            section {
+                padding: 18px
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>✚ eHealthCare</h1>
+        <p>Trang bác sĩ — Kê đơn thuốc sau khi lưu chẩn đoán</p>
+    </header>
+    <main>
+        <section>
+            <h2>KÊ ĐƠN THUỐC</h2>
+            <div class="info">
+                <div><small>Số thứ tự</small><strong>@Model.SoThuTu.ToString("D3")</strong></div>
+                <div><small>Mã lượt khám / phiếu khám</small><strong>@Model.MaLuot / @Model.MaPhieu</strong></div>
+                <div><small>Bệnh nhân</small><strong>@Model.TenBenhNhan</strong></div>
+                <div><small>Bác sĩ phụ trách</small><strong>@Model.TenBacSi</strong></div>
+                <div style="grid-column:1/-1"><small>Chẩn đoán đã lưu</small><strong>@Model.ChanDoan</strong></div>
+            </div>
+        </section>
+        <section>
+            <h3>Thêm thuốc vào đơn</h3>
+            @if (TempData["ThongBaoKeDon"] != null)
+            {
+                <div class="success">@TempData["ThongBaoKeDon"]</div>
+            }
+            @if (TempData["LoiKeDon"] != null)
+            {
+                <div class="error">@TempData["LoiKeDon"]</div>
+            }
+            @if (!coTheThem)
+            {
+                <div class="error">Không thể thêm thuốc: chưa có danh mục thuốc hoặc đơn đã được chuyển trạng thái phát.</div>
+            }
+            <form method="post" action="@Url.Action("ThemThuoc", "DonThuoc")">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="maLuot" value="@Model.MaLuot" />
+                <div class="grid">
+                    <div class="field">
+                        <label for="maThuoc">Thuốc *</label>
+                        <select id="maThuoc" name="maThuoc" required>
+                            <option value="">-- Chọn thuốc --</option>
+                            @foreach (var t in Model.DanhSachThuoc)
+                            {
+                                <option value="@t.Value">@t.Text</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="field"><label for="soLuong">Số lượng *</label><input id="soLuong" name="soLuong" type="number" min="1" max="1000" value="1" required /></div>
+                    <div class="field"><label for="lieuSang">Liều sáng</label><input id="lieuSang" name="lieuSang" maxlength="50" placeholder="Theo chỉ định bác sĩ" /></div>
+                    <div class="field"><label for="lieuTrua">Liều trưa</label><input id="lieuTrua" name="lieuTrua" maxlength="50" /></div>
+                    <div class="field"><label for="lieuChieu">Liều chiều</label><input id="lieuChieu" name="lieuChieu" maxlength="50" /></div>
+                    <div class="field"><label for="lieuToi">Liều tối</label><input id="lieuToi" name="lieuToi" maxlength="50" /></div>
+                    <div class="field">
+                        <label for="truocHaySauAn">Thời điểm uống *</label>
+                        <select id="truocHaySauAn" name="truocHaySauAn" required>
+                            <option value="">-- Chọn --</option>
+                            <option value="Trước ăn">Trước ăn</option>
+                            <option value="Sau ăn">Sau ăn</option>
+                        </select>
+                    </div>
+                </div>
+                <p class="hint">Bác sĩ tự nhập liều và số lượng theo chỉ định chuyên môn. Mỗi lần nhấn lưu sẽ thêm một loại thuốc vào đơn, không thêm trùng thuốc.</p>
+                <button type="submit" class="button" disabled="@(coTheThem ? null : "disabled")">Thêm thuốc vào đơn</button>
+            </form>
+        </section>
+        <section>
+            <h3>Chi tiết đơn thuốc</h3>
+            @if (Model.MaDon.HasValue)
+            {
+                <p class="hint">Mã đơn: <strong>@Model.MaDon</strong> — Trạng thái phát: <strong>@Model.TrangThaiPhat</strong></p>
+            }
+            @if (Model.ChiTiet.Count == 0)
+            {
+                <p class="hint">Chưa có thuốc nào trong đơn.</p>
+            }
+            else
+            {
+                <div class="scroll">
+                    <table>
+                        <thead><tr><th>Thuốc</th><th>Số lượng</th><th>Sáng / Trưa / Chiều / Tối</th><th>Ăn</th><th>Tạm tính</th></tr></thead>
+                        <tbody>
+                            @foreach (var item in Model.ChiTiet)
+                            {
+                                <tr>
+                                    <td>@item.TenThuoc</td>
+                                    <td>@item.SoLuong</td>
+                                    <td>@item.LieuSang / @item.LieuTrua / @item.LieuChieu / @item.LieuToi</td>
+                                    <td>@item.TruocHaySauAn</td>
+                                    <td>@((item.DonGia * item.SoLuong).ToString("N0")) đ</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="total">Tạm tính: @tongTamTinh.ToString("N0") đ</div>
+            }
+            <p class="hint">Chưa phát thuốc và chưa hoàn tất khám ở bước này. Giá hiển thị là tạm tính theo danh mục THUOC, không phải hóa đơn cuối cùng.</p>
+            <a class="link" href="@Url.Action("KhamBenh", "BacSi", new { id = Model.MaLuot })">← Quay lại phiếu khám</a>
+        </section>
+    </main>
+</body>
+</html>

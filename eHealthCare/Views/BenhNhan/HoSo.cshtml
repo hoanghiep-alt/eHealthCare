@@ -1,0 +1,294 @@
+﻿
+@{
+    ViewBag.Title = "Hồ sơ bệnh nhân";
+    Layout = null;
+
+    string hoTen = Convert.ToString(ViewBag.HoTen ?? "");
+    string soDienThoai =
+        Convert.ToString(ViewBag.SoDienThoai ?? "");
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1" />
+
+    <title>Hồ sơ bệnh nhân - eHealthCare</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #eef5fa;
+            color: #243b53;
+        }
+
+        .header {
+            background: #087a9b;
+            padding: 25px 20px;
+            text-align: center;
+            color: white;
+        }
+
+            .header h1 {
+                margin: 0;
+                font-size: 32px;
+            }
+
+            .header p {
+                margin: 10px 0 0;
+            }
+
+        .container {
+            width: 94%;
+            max-width: 700px;
+            margin: 40px auto;
+            background: white;
+            padding: 38px;
+            border-radius: 16px;
+            box-shadow: 0 8px 28px rgba(0,0,0,0.07);
+        }
+
+        h2 {
+            text-align: center;
+            color: #087a9b;
+            margin-top: 0;
+        }
+
+        .description {
+            color: #667788;
+            text-align: center;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #34495e;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 15px;
+        }
+
+            input:focus, textarea:focus {
+                outline: none;
+                border-color: #087a9b;
+            }
+
+        textarea {
+            min-height: 90px;
+            resize: vertical;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .note {
+            color: #667788;
+            font-size: 13px;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            background: #e9f7fb;
+            padding: 14px;
+            border-radius: 8px;
+        }
+
+        .error {
+            background: #fff0ef;
+            color: #a52c2c;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .btn-save {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: #087a9b;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+            .btn-save:hover {
+                background: #06637e;
+            }
+
+        .back {
+            display: block;
+            text-align: center;
+            margin-top: 23px;
+            color: #087a9b;
+            text-decoration: none;
+        }
+
+        @@media (max-width: 600px) {
+            .container {
+                padding: 24px 20px;
+                margin: 20px auto;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="header">
+        <h1>✚ eHealthCare</h1>
+        <p>Hệ thống đăng ký khám bệnh trực tuyến</p>
+    </header>
+
+    <main class="container">
+
+        <h2>HOÀN THIỆN HỒ SƠ BỆNH NHÂN</h2>
+
+        <p class="description">
+            Vui lòng cung cấp thông tin cá nhân
+            để tạo hồ sơ khám bệnh.
+        </p>
+
+        <div class="note">
+            Thông tin này được sử dụng để lập hồ sơ
+            bệnh nhân và liên kết với tài khoản của bạn.
+            Vui lòng kiểm tra kỹ trước khi lưu.
+        </div>
+
+        @if (ViewBag.Error != null)
+        {
+            <div class="error">
+                @ViewBag.Error
+            </div>
+        }
+
+        <form method="post"
+              action="@Url.Action("HoSo", "BenhNhan")">
+
+            @Html.AntiForgeryToken()
+
+            <!-- Họ và tên -->
+            <div class="form-group">
+
+                <label for="HoTen">
+                    Họ và tên bệnh nhân *
+                </label>
+
+                <input type="text"
+                       id="HoTen"
+                       name="HoTen"
+                       value="@hoTen"
+                       placeholder="Nhập họ và tên đầy đủ"
+                       maxlength="100"
+                       autocomplete="name"
+                       required />
+            </div>
+
+            <!-- Ngày sinh -->
+            <div class="form-group">
+
+                <label for="NgaySinh">
+                    Ngày sinh *
+                </label>
+
+                <input type="date"
+                       id="NgaySinh"
+                       name="NgaySinh"
+                       required />
+            </div>
+
+            <!-- Địa chỉ -->
+            <div class="form-group">
+
+                <label for="DiaChi">
+                    Địa chỉ liên hệ *
+                </label>
+
+                <textarea id="DiaChi"
+                          name="DiaChi"
+                          maxlength="200"
+                          placeholder="Số nhà, đường, phường/xã, tỉnh/thành phố"
+                          required></textarea>
+            </div>
+
+            <!-- Số điện thoại -->
+            <div class="form-row">
+
+                <div class="form-group">
+
+                    <label for="SoDienThoai">
+                        Số điện thoại *
+                    </label>
+
+                    <input type="tel"
+                           id="SoDienThoai"
+                           name="SoDienThoai"
+                           value="@soDienThoai"
+                           pattern="0[0-9]{9}"
+                           maxlength="10"
+                           placeholder="0901234567"
+                           required />
+                </div>
+
+                <div class="form-group">
+
+                    <label for="SDTNguoiNha">
+                        SĐT người thân *
+                    </label>
+
+                    <input type="tel"
+                           id="SDTNguoiNha"
+                           name="SDTNguoiNha"
+                           pattern="0[0-9]{9}"
+                           maxlength="10"
+                           placeholder="0987654321"
+                           required />
+                </div>
+
+            </div>
+
+            <button type="submit"
+                    class="btn-save">
+                Lưu hồ sơ và tiếp tục
+            </button>
+
+        </form>
+
+        <a class="back"
+           href="@Url.Action("Index", "Home")">
+            ← Quay lại trang chủ
+        </a>
+
+    </main>
+
+</body>
+</html>

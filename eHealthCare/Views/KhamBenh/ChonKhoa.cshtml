@@ -1,0 +1,418 @@
+﻿
+@using System.Collections.Generic
+@using System.Web.Mvc
+
+@{
+    ViewBag.Title = "Chọn chuyên khoa";
+    Layout = null;
+
+    var danhSach = ViewBag.DanhSach as List<SelectListItem>
+                   ?? new List<SelectListItem>();
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1" />
+
+    <title>Chọn chuyên khoa - eHealthCare</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f1f5f6;
+            color: #243b53;
+        }
+
+        /* THANH ĐẦU TRANG */
+        .header {
+            background: #087a9b;
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+        }
+
+            .header h1 {
+                margin: 0;
+                font-size: 32px;
+            }
+
+            .header p {
+                margin-top: 10px;
+                font-size: 15px;
+            }
+
+        /* NỘI DUNG */
+        .container {
+            width: 94%;
+            max-width: 1200px;
+            margin: 40px auto;
+        }
+
+        .page-title {
+            text-align: center;
+            color: #087a9b;
+            font-size: 30px;
+            margin-bottom: 10px;
+        }
+
+        .description {
+            text-align: center;
+            color: #667788;
+            margin-bottom: 35px;
+            font-size: 16px;
+        }
+
+        /* LƯỚI CHUYÊN KHOA */
+        .specialty-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .specialty-form {
+            margin: 0;
+        }
+
+        /* THẺ CHUYÊN KHOA */
+        .specialty-card {
+            width: 100%;
+            height: 205px;
+            background: white;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 22px 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 16px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s ease;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.035);
+        }
+
+            .specialty-card:hover {
+                border-color: #1595e6;
+                box-shadow: 0 8px 25px rgba(0,119,190,0.13);
+                transform: translateY(-4px);
+            }
+
+            .specialty-card:focus-visible {
+                outline: 3px solid #1595e6;
+                outline-offset: 3px;
+            }
+
+        /* VÒNG TRÒN BIỂU TƯỢNG */
+        .icon-circle {
+            width: 94px;
+            height: 94px;
+            border: 3px solid #1595e6;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1595e6;
+            flex-shrink: 0;
+        }
+
+
+            .icon-circle svg {
+                width: 56px;
+                height: 56px;
+                stroke: currentColor;
+                stroke-width: 2.2px;
+                stroke-linecap: round;
+                stroke-linejoin: round;
+                fill: none;
+            }
+
+
+        /* TÊN CHUYÊN KHOA */
+        .specialty-name {
+            color: #17354a;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        /* KHI SQL CHƯA CÓ DỮ LIỆU */
+        .empty-message {
+            background: white;
+            text-align: center;
+            padding: 45px 20px;
+            border-radius: 12px;
+            color: #667788;
+        }
+
+            .empty-message h3 {
+                color: #087a9b;
+            }
+
+        .error {
+            background: #fff0ef;
+            color: #a52c2c;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 20px;
+        }
+
+        .back {
+            display: block;
+            width: fit-content;
+            margin: 35px auto;
+            color: #087a9b;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+            .back:hover {
+                text-decoration: underline;
+            }
+
+        /* MÀN HÌNH MÁY TÍNH BẢNG */
+        @@media (max-width: 900px) {
+            .specialty-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* MÀN HÌNH ĐIỆN THOẠI */
+        @@media (max-width: 600px) {
+            .specialty-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+
+            .specialty-card {
+                height: 180px;
+                padding: 16px 8px;
+            }
+
+            .icon-circle {
+                width: 76px;
+                height: 76px;
+            }
+
+                .icon-circle svg {
+                    width: 45px;
+                    height: 45px;
+                }
+
+            .specialty-name {
+                font-size: 12px;
+            }
+
+            .page-title {
+                font-size: 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- BIỂU TƯỢNG Y TẾ DÙNG CHUNG -->
+    <svg xmlns="http://www.w3.org/2000/svg"
+         style="position:absolute;width:0;height:0;overflow:hidden"
+         aria-hidden="true">
+
+        <symbol id="icon-medical" viewBox="0 0 64 64">
+            <rect x="13" y="13" width="38" height="38" rx="10" />
+            <path d="M32 21v22M21 32h22" />
+        </symbol>
+
+        <symbol id="icon-heart" viewBox="0 0 64 64">
+            <path d="M32 51L13 32C1 18 21 4 32 19
+                     43 4 63 18 51 32Z" />
+            <path d="M13 33h10l5-10 8 19 5-9h10" />
+        </symbol>
+
+        <symbol id="icon-kidney" viewBox="0 0 64 64">
+            <path d="M24 11C10 7 5 21 10 35
+                     c4 13 15 17 22 9
+                     c5-6 1-13-5-14
+                     c-8-2-5-12-3-19Z" />
+            <path d="M40 11c14-4 19 10 14 24
+                     c-4 13-15 17-22 9
+                     c-5-6-1-13 5-14
+                     c8-2 5-12 3-19Z" />
+        </symbol>
+
+        <symbol id="icon-eye" viewBox="0 0 64 64">
+            <path d="M6 32s10-17 26-17
+                     26 17 26 17
+                     -10 17-26 17S6 32 6 32Z" />
+            <circle cx="32" cy="32" r="10" />
+            <circle cx="32" cy="32" r="4" />
+        </symbol>
+
+        <symbol id="icon-brain" viewBox="0 0 64 64">
+            <path d="M30 12c-10-8-22 1-19 12
+                     -9 7-5 20 4 21
+                     0 10 12 14 17 6V15
+                     M34 12c10-8 22 1 19 12
+                     9 7 5 20-4 21
+                     0 10-12 14-17 6V15" />
+            <path d="M18 25l8 5-7 7M46 25l-8 5 7 7" />
+        </symbol>
+
+        <symbol id="icon-digestive" viewBox="0 0 64 64">
+            <path d="M24 10v15c0 6 6 8 10 5
+                     8-8 23 0 19 12
+                     -3 9-13 12-21 8
+                     -8-4-16-3-18-12
+                     -2-9 8-14 15-9" />
+            <path d="M24 10h-7M35 40c8-5 13 4 6 9" />
+        </symbol>
+
+        <symbol id="icon-children" viewBox="0 0 64 64">
+            <circle cx="23" cy="19" r="9" />
+            <circle cx="45" cy="25" r="7" />
+            <path d="M7 52V42c0-9 7-15 16-15
+                     s16 6 16 15v10
+                     M39 38c9-7 20-1 20 10v4" />
+        </symbol>
+
+        <symbol id="icon-bone" viewBox="0 0 64 64">
+            <path d="M16 14a7 7 0 1 0-2 13
+                     l23 23a7 7 0 1 0 13-2
+                     7 7 0 0 0-1-11
+                     L27 14a7 7 0 0 0-11 0Z" />
+        </symbol>
+
+    </svg>
+
+    <!-- HEADER -->
+    <header class="header">
+        <h1>✚ eHealthCare</h1>
+        <p>Hệ thống đăng ký khám bệnh trực tuyến</p>
+    </header>
+
+    <main class="container">
+
+        <h2 class="page-title">
+            CHỌN CHUYÊN KHOA KHÁM BỆNH
+        </h2>
+
+        <p class="description">
+            Vui lòng chọn chuyên khoa phù hợp với nhu cầu khám bệnh.
+        </p>
+
+        @if (ViewBag.Error != null)
+        {
+            <div class="error">
+                @ViewBag.Error
+            </div>
+        }
+
+        @if (danhSach.Count > 0)
+        {
+            <div class="specialty-grid">
+
+                @foreach (var khoa in danhSach)
+                {
+                    string ten =
+                        (khoa.Text ?? "").ToLowerInvariant();
+
+                    string iconId = "icon-medical";
+
+                    // Chọn biểu tượng minh họa theo tên khoa
+                    if (ten.Contains("thận") ||
+                        ten.Contains("lọc máu"))
+                    {
+                        iconId = "icon-kidney";
+                    }
+                    else if (ten.Contains("tim") ||
+                             ten.Contains("mạch"))
+                    {
+                        iconId = "icon-heart";
+                    }
+                    else if (ten.Contains("mắt"))
+                    {
+                        iconId = "icon-eye";
+                    }
+                    else if (ten.Contains("thần kinh"))
+                    {
+                        iconId = "icon-brain";
+                    }
+                    else if (ten.Contains("gan") ||
+                             ten.Contains("tiêu hóa") ||
+                             ten.Contains("nội soi"))
+                    {
+                        iconId = "icon-digestive";
+                    }
+                    else if (ten.Contains("nhi") ||
+                             ten.Contains("sản"))
+                    {
+                        iconId = "icon-children";
+                    }
+                    else if (ten.Contains("xương") ||
+                             ten.Contains("khớp") ||
+                             ten.Contains("cột sống"))
+                    {
+                        iconId = "icon-bone";
+                    }
+
+                    <form class="specialty-form"
+                          method="post"
+                          action="@Url.Action("ChonKhoa", "KhamBenh")">
+
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden"
+                               name="ma_ck"
+                               value="@khoa.Value" />
+
+                        <button type="submit"
+                                class="specialty-card">
+
+                            <span class="icon-circle">
+
+                                <svg aria-hidden="true">
+                                    <use href="#@iconId"
+                                         xlink:href="#@iconId" />
+                                </svg>
+
+                            </span>
+
+                            <span class="specialty-name">
+                                @khoa.Text
+                            </span>
+
+                        </button>
+                    </form>
+                }
+
+            </div>
+        }
+        else
+        {
+            <div class="empty-message">
+                <h3>Chưa có chuyên khoa</h3>
+
+                <p>
+                    Hiện chưa tìm thấy dữ liệu trong
+                    bảng CHUYEN_KHOA của SQL Server.
+                </p>
+            </div>
+        }
+
+        <a class="back"
+           href="@Url.Action("NhapThe", "BaoHiem")">
+            ← Quay lại thông tin BHYT
+        </a>
+
+    </main>
+</body>
+</html>

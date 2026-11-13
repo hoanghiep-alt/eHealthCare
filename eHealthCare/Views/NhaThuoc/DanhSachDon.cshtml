@@ -1,0 +1,200 @@
+﻿@model List<eHealthCare.Controllers.NhaThuocDonItem>
+@using System
+@using System.Collections.Generic
+
+@{
+    ViewBag.Title = "Nhà thuốc - Danh sách đơn chưa phát";
+    Layout = null;
+    var ds = Model ?? new List<eHealthCare.Controllers.NhaThuocDonItem>();
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Nhà thuốc - eHealthCare</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial,sans-serif;
+            background: #f1f6f8;
+            color: #23394b;
+        }
+
+        .header {
+            background: #087a9b;
+            color: #fff;
+            padding: 18px 5%;
+        }
+
+        .header-inner {
+            max-width: 1100px;
+            margin: auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 25px;
+        }
+
+        .header p {
+            margin: 5px 0 0;
+            font-size: 13px;
+        }
+
+        .logout {
+            border: 0;
+            background: #fff;
+            color: #087a9b;
+            padding: 10px 16px;
+            border-radius: 7px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        main {
+            max-width: 1100px;
+            width: 94%;
+            margin: 30px auto;
+        }
+
+        h2 {
+            color: #087a9b;
+            margin: 0 0 10px;
+        }
+
+        .sub {
+            color: #63788a;
+            margin: 0 0 24px;
+        }
+
+        .summary {
+            display: inline-block;
+            background: #e3f5fa;
+            border-radius: 8px;
+            padding: 12px 17px;
+            margin-bottom: 20px;
+        }
+
+        .panel {
+            background: #fff;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 3px 14px rgba(0,0,0,.05);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 680px;
+        }
+
+        th {
+            padding: 14px;
+            text-align: left;
+            background: #e9f5f9;
+            color: #087a9b;
+        }
+
+        td {
+            padding: 14px;
+            border-bottom: 1px solid #edf1f4;
+        }
+
+        .btn {
+            display: inline-block;
+            border: 0;
+            border-radius: 7px;
+            background: #087a9b;
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .refresh {
+            margin: 0 0 17px;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 35px 10px;
+            color: #657c8d;
+        }
+
+        .error {
+            background: #fff0ef;
+            color: #a32d2d;
+            border-radius: 8px;
+            padding: 14px;
+            margin: 14px 0;
+        }
+
+        .note {
+            color: #687d8d;
+            font-size: 13px;
+            line-height: 1.6;
+            margin-top: 18px;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <div><h1>✚ eHealthCare</h1><p>Nhà thuốc - Quản lý cấp phát thuốc</p></div>
+            @using (Html.BeginForm("DangXuat", "Account", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                <button class="logout" type="submit">Đăng xuất</button>
+            }
+        </div>
+    </header>
+    <main>
+        <h2>DANH SÁCH ĐƠN CHƯA PHÁT</h2>
+        <p class="sub">Chỉ hiển thị đơn thuốc của lượt khám đã hoàn tất.</p>
+        <div class="summary">Đơn đang chờ: <strong>@ds.Count</strong></div>
+        @if (ViewBag.Error != null)
+        {
+            <div class="error">@ViewBag.Error</div>
+        }
+        <div><a class="btn refresh" href="@Url.Action("DanhSachDon", "NhaThuoc")">Làm mới danh sách</a></div>
+        <section class="panel">
+            @if (ds.Count == 0)
+            {
+                <div class="empty">Chưa có đơn thuốc nào đang chờ cấp phát.</div>
+            }
+            else
+            {
+                <table>
+                    <thead><tr><th>Mã đơn</th><th>Số khám</th><th>Bệnh nhân</th><th>Số loại thuốc</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
+                    <tbody>
+                        @foreach (var d in ds)
+                        {
+                            <tr>
+                                <td><strong>@d.MaDon</strong></td>
+                                <td>@d.SoThuTu.ToString("D3")</td>
+                                <td>@d.TenBenhNhan</td>
+                                <td>@d.SoLoaiThuoc</td>
+                                <td>@d.TrangThaiPhat</td>
+                                <td><a class="btn" href="@Url.Action("ChiTietDon", "NhaThuoc", new { id = d.MaDon })">Xem đơn</a></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </section>
+        <p class="note">Dữ liệu đồ án: Việc xác nhận chỉ cập nhật trạng thái cấp phát trong SQL; chưa kiểm tra tồn kho thực tế, hạn dùng hay thực hiện thanh toán.</p>
+    </main>
+</body>
+</html>

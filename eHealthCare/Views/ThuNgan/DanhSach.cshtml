@@ -1,0 +1,252 @@
+﻿@model List<eHealthCare.Controllers.ThuNganDanhSachItem>
+@using System
+@using System.Linq
+
+@{
+    Layout = null;
+    ViewBag.Title = "Danh sách thu ngân";
+    var ds = Model ?? new List<eHealthCare.Controllers.ThuNganDanhSachItem>();
+    int choThu = ds.Count(x => !x.DaThanhToan && x.DonChuaPhat == 0);
+    int choPhat = ds.Count(x => !x.DaThanhToan && x.DonChuaPhat > 0);
+    int daThu = ds.Count(x => x.DaThanhToan);
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Thu ngân - eHealthCare</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f1f6f8;
+            color: #233b50;
+        }
+
+        header {
+            background: #087a9b;
+            color: white;
+            padding: 22px max(5%, calc((100% - 1150px)/2));
+        }
+
+            header h1 {
+                margin: 0;
+                font-size: 26px;
+            }
+
+            header p {
+                margin: 7px 0 0;
+                opacity: .9;
+            }
+
+        main {
+            width: 94%;
+            max-width: 1150px;
+            margin: 32px auto;
+        }
+
+        h2 {
+            color: #087a9b;
+            margin: 0 0 8px;
+        }
+
+        .muted {
+            color: #698091;
+            font-size: 14px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3,1fr);
+            gap: 14px;
+            margin: 22px 0;
+        }
+
+        .stat, .panel {
+            background: #fff;
+            padding: 22px;
+            border-radius: 12px;
+            box-shadow: 0 4px 18px rgba(0,0,0,.04);
+        }
+
+            .stat strong {
+                display: block;
+                font-size: 32px;
+                margin-top: 9px;
+                color: #087a9b;
+            }
+
+        .panel {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 690px;
+        }
+
+        th {
+            text-align: left;
+            background: #e8f5fa;
+            color: #087a9b;
+            padding: 13px;
+        }
+
+        td {
+            padding: 14px 13px;
+            border-bottom: 1px solid #e7edf1;
+        }
+
+        .badge {
+            display: inline-block;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 8px 11px;
+            border-radius: 50px;
+        }
+
+        .ready {
+            color: #126d43;
+            background: #e5f7eb;
+        }
+
+        .pending {
+            color: #946000;
+            background: #fff1d6;
+        }
+
+        .paid {
+            color: #17663b;
+            background: #e0f4eb;
+        }
+
+        .btn {
+            display: inline-block;
+            background: #087a9b;
+            color: white;
+            text-decoration: none;
+            border: 0;
+            border-radius: 7px;
+            padding: 10px 15px;
+            font-weight: bold;
+        }
+
+            .btn:hover {
+                background: #066783;
+            }
+
+        .error {
+            padding: 13px;
+            border-radius: 8px;
+            background: #fff0ef;
+            color: #a52c2c;
+            margin-bottom: 18px;
+        }
+
+        .bottom {
+            margin-top: 24px;
+        }
+
+        .logout {
+            float: right;
+            background: white;
+            color: #087a9b;
+            border: 0;
+            border-radius: 8px;
+            padding: 9px 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        @@media(max-width: 650px) {
+            .stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div style="float:right;">
+            <form method="post" action="@Url.Action("DangXuat", "Account")">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="logout">Đăng xuất</button>
+            </form>
+        </div>
+        <h1>✚ eHealthCare</h1>
+        <p>Quầy thu ngân — Thanh toán viện phí</p>
+    </header>
+    <main>
+        <h2>DANH SÁCH THANH TOÁN</h2>
+        <div class="muted">Chỉ hiển thị lượt khám đã hoàn tất. Thanh toán tiền mặt trong mô hình thử nghiệm.</div>
+
+        @if (ViewBag.Error != null)
+        {
+            <div class="error">@ViewBag.Error</div>
+        }
+
+        <div class="stats">
+            <div class="stat">Sẵn sàng thu tiền<strong>@choThu</strong></div>
+            <div class="stat">Chờ phát thuốc<strong>@choPhat</strong></div>
+            <div class="stat">Đã thanh toán<strong>@daThu</strong></div>
+        </div>
+
+        <section class="panel">
+            <h3>Danh sách lượt khám</h3>
+            @if (ds.Count > 0)
+            {
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Mã lượt / Số</th>
+                            <th>Bệnh nhân</th>
+                            <th>Ngày khám</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in ds)
+                        {
+                            <tr>
+                                <td>#@item.MaLuot / <strong>@item.SoThuTu.ToString("D3")</strong></td>
+                                <td>@item.TenBenhNhan</td>
+                                <td>@item.NgayKham.ToString("dd/MM/yyyy")</td>
+                                <td>
+                                    @if (item.DaThanhToan)
+                                    {
+                                        <span class="badge paid">Đã thanh toán</span>
+                                    }
+                                    else if (item.DonChuaPhat > 0)
+                                    {
+                                        <span class="badge pending">Chờ phát thuốc</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge ready">Chờ thu tiền</span>
+                                    }
+                                </td>
+                                <td>
+                                    <a class="btn" href="@Url.Action("ChiTiet", "ThuNgan", new { id = item.MaLuot })">Xem thanh toán</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p class="muted">Chưa có lượt khám đã hoàn tất.</p>
+            }
+        </section>
+        <a class="btn bottom" href="@Url.Action("DanhSach", "ThuNgan")">Làm mới danh sách</a>
+    </main>
+</body>
+</html>
+    

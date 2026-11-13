@@ -1,0 +1,198 @@
+﻿@model List<eHealthCare.Controllers.BacSiTrucItem>
+@using System
+@using System.Collections.Generic
+
+@{
+    ViewBag.Title = "Chọn bác sĩ đang trực";
+    Layout = null;
+    var danhSach = Model ?? new List<eHealthCare.Controllers.BacSiTrucItem>();
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="refresh" content="20" />
+    <title>Chọn bác sĩ đang trực - eHealthCare</title>
+    <style>
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial,sans-serif;
+            background: #f1f6f8;
+            color: #263a49
+        }
+
+        .top {
+            background: #087a9b;
+            color: #fff;
+            padding: 20px 5%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px
+        }
+
+            .top h1 {
+                font-size: 23px;
+                margin: 0
+            }
+
+            .top p {
+                font-size: 13px;
+                margin: 5px 0 0
+            }
+
+        .logout {
+            background: #fff;
+            color: #087a9b;
+            border: 0;
+            border-radius: 7px;
+            padding: 10px 16px;
+            cursor: pointer;
+            font-weight: bold
+        }
+
+        .container {
+            max-width: 1150px;
+            width: 94%;
+            margin: 36px auto
+        }
+
+        .intro {
+            margin-bottom: 24px
+        }
+
+            .intro h2 {
+                color: #087a9b;
+                margin-bottom: 8px
+            }
+
+            .intro p {
+                color: #66808f;
+                margin: 0
+            }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3,minmax(0,1fr));
+            gap: 18px
+        }
+
+        .card {
+            background: white;
+            border-radius: 14px;
+            padding: 22px;
+            border: 1px solid #e4edf2;
+            box-shadow: 0 5px 20px rgba(26,63,82,.05)
+        }
+
+        .specialty {
+            font-size: 13px;
+            color: #0784a6;
+            margin-bottom: 11px;
+            font-weight: bold
+        }
+
+        .name {
+            font-size: 19px;
+            font-weight: bold;
+            margin-bottom: 14px;
+            min-height: 48px
+        }
+
+        .waiting {
+            color: #7d6011;
+            background: #fff4d9;
+            display: inline-block;
+            border-radius: 20px;
+            padding: 8px 13px;
+            font-size: 13px
+        }
+
+        .btn {
+            margin-top: 18px;
+            background: #087a9b;
+            color: #fff;
+            display: block;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-weight: bold
+        }
+
+        .alert {
+            background: #fff0ef;
+            color: #ad3333;
+            padding: 14px;
+            border-radius: 8px;
+            margin-bottom: 20px
+        }
+
+        .empty {
+            background: #fff;
+            padding: 35px;
+            border-radius: 12px;
+            color: #617787;
+            text-align: center
+        }
+
+        @@media(max-width:900px) {
+            .grid {
+                grid-template-columns: repeat(2,minmax(0,1fr))
+            }
+        }
+
+        @@media(max-width:600px) {
+            .grid {
+                grid-template-columns: 1fr
+            }
+
+            .top {
+                flex-wrap: wrap
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="top">
+        <div><h1>✚ eHealthCare</h1><p>Điều phối bệnh nhân — bác sĩ đang trực</p></div>
+        <form method="post" action="@Url.Action("DangXuat", "Account")">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="logout">Đăng xuất</button>
+        </form>
+    </header>
+    <main class="container">
+        <section class="intro">
+            <h2>CHỌN BÁC SĨ ĐANG TRỰC</h2>
+            <p>Chọn bác sĩ để xem số thứ tự và gọi bệnh nhân vào khám. Danh sách lấy trực tiếp từ lịch trực hiện tại.</p>
+        </section>
+        @if (TempData["LoiChonBacSi"] != null)
+        {
+            <div class="alert">@TempData["LoiChonBacSi"]</div>
+        }
+        @if (danhSach.Count == 0)
+        {
+            <div class="empty">Hiện không có bác sĩ đang trực trong phạm vi tài khoản được phép quản lý.</div>
+        }
+        else
+        {
+            <div class="grid">
+                @foreach (var bacSi in danhSach)
+                {
+                    <article class="card">
+                        <div class="specialty">@bacSi.TenKhoa</div>
+                        <div class="name">@bacSi.TenBacSi</div>
+                        <span class="waiting">@bacSi.SoCho bệnh nhân chờ</span>
+                        <a class="btn" href="@Url.Action("DanhSachCho", "BacSi", new { ma_bs = bacSi.MaBacSi })">Xem danh sách &amp; gọi số</a>
+                    </article>
+                }
+            </div>
+        }
+    </main>
+</body>
+</html>

@@ -1,0 +1,325 @@
+﻿@model eHealthCare.Controllers.DanhSachChoViewModel
+@using System
+@using System.Linq
+
+@{
+    ViewBag.Title = "Danh sách bệnh nhân chờ khám";
+    Layout = null;
+    var danhSach = Model.DanhSach;
+    int soCho = danhSach.Count(x => x.TrangThai == "Chờ khám");
+    int soDangKham = danhSach.Count(x => x.TrangThai == "Đang khám");
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="refresh" content="20" />
+    <title>Danh sách bệnh nhân - eHealthCare</title>
+    <style>
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial,sans-serif;
+            background: #f1f6f8;
+            color: #283d4c
+        }
+
+        .top {
+            background: #087a9b;
+            color: white;
+            padding: 20px 5%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px
+        }
+
+            .top h1 {
+                font-size: 23px;
+                margin: 0
+            }
+
+            .top p {
+                font-size: 13px;
+                margin: 5px 0 0
+            }
+
+        .logout {
+            background: white;
+            color: #087a9b;
+            border: none;
+            border-radius: 7px;
+            padding: 10px 16px;
+            font-weight: bold;
+            cursor: pointer
+        }
+
+        .container {
+            max-width: 1150px;
+            width: 94%;
+            margin: 30px auto
+        }
+
+        .link {
+            color: #087a9b;
+            text-decoration: none;
+            font-weight: bold
+        }
+
+        h2 {
+            color: #087a9b;
+            margin: 16px 0 6px
+        }
+
+        .sub {
+            color: #66808f;
+            margin: 0 0 25px
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2,1fr);
+            gap: 16px;
+            margin-bottom: 22px
+        }
+
+        .stat {
+            background: white;
+            border-radius: 12px;
+            padding: 23px;
+            box-shadow: 0 3px 12px rgba(0,0,0,.04)
+        }
+
+        .number {
+            color: #087a9b;
+            font-size: 37px;
+            font-weight: bold;
+            margin-top: 7px
+        }
+
+        .panel {
+            background: white;
+            border-radius: 12px;
+            padding: 22px;
+            overflow-x: auto;
+            box-shadow: 0 3px 12px rgba(0,0,0,.04)
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 650px
+        }
+
+        th {
+            text-align: left;
+            background: #e9f6fa;
+            color: #087a9b;
+            padding: 13px
+        }
+
+        td {
+            padding: 14px;
+            border-bottom: 1px solid #e5edf0
+        }
+
+        .stt {
+            color: #087a9b;
+            font-size: 20px;
+            font-weight: bold
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 7px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold
+        }
+
+        .waiting {
+            background: #fff3d8;
+            color: #866014
+        }
+
+        .examining {
+            background: #e0f5e7;
+            color: #17663b
+        }
+
+        .button {
+            background: #087a9b;
+            color: white;
+            border: 0;
+            border-radius: 8px;
+            padding: 13px 19px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block
+        }
+
+            .button[disabled] {
+                background: #a3b7c0;
+                cursor: not-allowed
+            }
+
+        .exam-link {
+            display: inline-block;
+            padding: 9px 12px;
+            border-radius: 7px;
+            background: #087a9b;
+            color: white;
+            font-size: 13px;
+            text-decoration: none;
+            font-weight: bold
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 22px;
+            flex-wrap: wrap
+        }
+
+        .success {
+            background: #e5f7ec;
+            color: #17663b;
+            padding: 14px;
+            border-radius: 8px;
+            margin-bottom: 16px
+        }
+
+        .error {
+            background: #fff0ef;
+            color: #a52c2c;
+            padding: 14px;
+            border-radius: 8px;
+            margin-bottom: 16px
+        }
+
+        .empty {
+            text-align: center;
+            color: #607888;
+            padding: 35px 8px
+        }
+
+        @@media(max-width:600px) {
+            .stats {
+                grid-template-columns: 1fr
+            }
+
+            .top {
+                flex-wrap: wrap
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="top">
+        <div><h1>✚ eHealthCare</h1><p>Danh sách bệnh nhân theo ca trực</p></div>
+        <form method="post" action="@Url.Action("DangXuat", "Account")">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="logout">Đăng xuất</button>
+        </form>
+    </header>
+    <main class="container">
+        <a class="link" href="@Url.Action("ChonBacSiTruc", "BacSi")">← Chọn bác sĩ khác</a>
+        <h2>@Model.TenBacSi</h2>
+        <p class="sub">@Model.TenKhoa — Lượt khám trong ca trực đang diễn ra</p>
+
+        @if (TempData["ThongBao"] != null)
+        {
+            <div class="success">@TempData["ThongBao"]</div>
+        }
+        @if (TempData["LoiGoiSo"] != null)
+        {
+            <div class="error">@TempData["LoiGoiSo"]</div>
+        }
+
+        <div class="stats">
+            <div class="stat">Bệnh nhân chờ khám<div class="number">@soCho</div></div>
+            <div class="stat">Bệnh nhân đang khám<div class="number">@soDangKham</div></div>
+        </div>
+
+        <div class="actions">
+            <form method="post" action="@Url.Action("GoiSoTiepTheo", "BacSi")">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="ma_bs" value="@Model.MaBacSi" />
+                <button class="button" type="submit"
+                        disabled="@(soCho > 0 && soDangKham == 0 ? null : "disabled")">
+                    📢 Gọi số tiếp theo
+                </button>
+            </form>
+            <a class="link" href="@Url.Action("DanhSachCho", "BacSi", new { ma_bs = Model.MaBacSi })">Làm mới danh sách</a>
+        </div>
+
+        @if (!Model.CoQuyenKham)
+        {
+            <p class="sub">Tài khoản điều phối được gọi số, nhưng không được nhập chẩn đoán thay bác sĩ khác.</p>
+        }
+        <section class="panel">
+            <h3>Danh sách lượt khám</h3>
+            @if (danhSach.Count == 0)
+            {
+                <div class="empty">Chưa có bệnh nhân chờ khám trong ca trực này.</div>
+            }
+            else
+            {
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Số</th>
+                            <th>Bệnh nhân</th>
+                            <th>Ngày khám</th>
+                            <th>Ca trực</th>
+                            <th>Trạng thái</th>
+                            @if (Model.CoQuyenKham)
+                            {
+                                <th>Thao tác</th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in danhSach)
+                        {
+                            <tr>
+                                <td class="stt">@item.SoThuTu.ToString("D3")</td>
+                                <td>@item.TenBenhNhan</td>
+                                <td>@item.NgayKham.ToString("dd/MM/yyyy")</td>
+                                <td>@item.TenCa</td>
+                                <td>
+                                    <span class="badge @(item.TrangThai == "Đang khám" ? "examining" : "waiting")">
+                                        @item.TrangThai
+                                    </span>
+                                </td>
+                                @if (Model.CoQuyenKham)
+                                {
+                                    <td>
+                                        @if (item.TrangThai == "Đang khám")
+                                        {
+                                            <a class="exam-link"
+                                               href="@Url.Action("KhamBenh", "BacSi", new { id = item.MaLuot })">
+                                                Mở phiếu khám
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <span>Chờ gọi</span>
+                                        }
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </section>
+    </main>
+</body>
+</html>

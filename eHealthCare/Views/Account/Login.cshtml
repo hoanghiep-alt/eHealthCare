@@ -1,0 +1,269 @@
+﻿
+@{
+    ViewBag.Title = "Đăng nhập";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1" />
+
+    <title>Đăng nhập - eHealthCare</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #eef5fa;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-box {
+            background: white;
+            width: 430px;
+            max-width: 100%;
+            padding: 38px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 30px;
+            font-weight: bold;
+            color: #087a9b;
+            margin-bottom: 12px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #20364b;
+            margin: 10px 0;
+        }
+
+        .description {
+            color: #667788;
+            text-align: center;
+            font-size: 14px;
+            margin-bottom: 28px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            color: #34495e;
+            margin: 16px 0 8px;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+            input:focus {
+                outline: none;
+                border-color: #087a9b;
+            }
+
+        .password-box {
+            position: relative;
+        }
+
+            .password-box input {
+                padding-right: 54px;
+            }
+
+        .btn-eye {
+            position: absolute;
+            top: 50%;
+            right: 8px;
+            transform: translateY(-50%);
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 21px;
+            padding: 8px;
+        }
+
+        .forgot {
+            text-align: right;
+            margin-top: 12px;
+            margin-bottom: 22px;
+        }
+
+        a {
+            color: #087a9b;
+            text-decoration: none;
+        }
+
+            a:hover {
+                text-decoration: underline;
+            }
+
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: #087a9b;
+            border: none;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+            .btn-login:hover {
+                background: #06637e;
+            }
+
+        .register {
+            margin-top: 24px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+            .register a {
+                font-weight: bold;
+            }
+
+        .message {
+            background: #e5f7ec;
+            color: #17663b;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 18px;
+            font-size: 14px;
+        }
+
+        .error {
+            background: #fff0ef;
+            color: #a52c2c;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 18px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-box">
+
+        <div class="logo">✚ eHealthCare</div>
+
+        <h2>Đăng nhập</h2>
+
+        <p class="description">
+            Hệ thống đăng ký khám bệnh trực tuyến
+        </p>
+
+        @if (TempData["ThongBao"] != null)
+        {
+            <div class="message">
+                @TempData["ThongBao"]
+            </div>
+        }
+
+        @if (ViewBag.Error != null)
+        {
+            <div class="error">
+                @ViewBag.Error
+            </div>
+        }
+
+        <form method="post"
+              action="@Url.Action("Login", "Account")">
+
+            @Html.AntiForgeryToken()
+
+            <label for="username">
+                Tên đăng nhập
+            </label>
+
+            <input type="text"
+                   id="username"
+                   name="TenDangNhap"
+                   placeholder="Nhập tên đăng nhập"
+                   maxlength="50"
+                   autocomplete="username"
+                   required />
+
+            <label for="password">
+                Mật khẩu
+            </label>
+
+            <div class="password-box">
+
+                <input type="password"
+                       id="password"
+                       name="Password"
+                       placeholder="Nhập mật khẩu"
+                       autocomplete="current-password"
+                       required />
+
+                <button type="button"
+                        class="btn-eye"
+                        id="btnEye"
+                        onclick="togglePassword()"
+                        aria-label="Hiện mật khẩu">
+                    👁
+                </button>
+
+            </div>
+
+            <div class="forgot">
+                <a href="@Url.Action("ForgotPassword", "Account")">
+                    Quên mật khẩu?
+                </a>
+            </div>
+
+            <button type="submit" class="btn-login">
+                Đăng nhập
+            </button>
+
+        </form>
+
+        <div class="register">
+            Chưa có tài khoản?
+            <a href="@Url.Action("Register", "Account")">
+                Đăng ký ngay
+            </a>
+        </div>
+
+    </div>
+
+    <script>
+        function togglePassword() {
+            var input =
+                document.getElementById("password");
+
+            var button =
+                document.getElementById("btnEye");
+
+            if (input.type === "password") {
+                input.type = "text";
+                button.setAttribute(
+                    "aria-label", "Ẩn mật khẩu");
+            } else {
+                input.type = "password";
+                button.setAttribute(
+                    "aria-label", "Hiện mật khẩu");
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,275 @@
+﻿@model eHealthCare.Controllers.ThuNganChiTietModel
+@using System
+@using System.Globalization
+
+@{
+    Layout = null;
+    ViewBag.Title = "Thanh toán lượt khám";
+    var vn = CultureInfo.GetCultureInfo("vi-VN");
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Chi tiết thanh toán - eHealthCare</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial,sans-serif;
+            background: #f1f6f8;
+            color: #233b50;
+        }
+
+        header {
+            background: #087a9b;
+            color: white;
+            padding: 25px 6%;
+        }
+
+            header h1 {
+                margin: 0;
+                font-size: 26px;
+            }
+
+            header p {
+                margin: 6px 0 0;
+            }
+
+        main {
+            width: 94%;
+            max-width: 790px;
+            margin: 30px auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 14px;
+            padding: 26px;
+            margin-bottom: 18px;
+            box-shadow: 0 4px 17px rgba(0,0,0,.05);
+        }
+
+        h2 {
+            color: #087a9b;
+            margin: 0 0 18px;
+        }
+
+        .details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+            .details div {
+                background: #f0f7fa;
+                padding: 13px;
+                border-radius: 8px;
+            }
+
+        small {
+            display: block;
+            color: #718495;
+            margin-bottom: 6px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        td, th {
+            padding: 12px;
+            border-bottom: 1px solid #e7edf1;
+            text-align: left;
+        }
+
+        th {
+            background: #e8f5fa;
+            color: #087a9b;
+        }
+
+        .right {
+            text-align: right;
+        }
+
+        .price {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e8eef3;
+            gap: 10px;
+        }
+
+        .total {
+            display: flex;
+            justify-content: space-between;
+            padding: 18px 0 5px;
+            gap: 10px;
+            color: #087a9b;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .msg {
+            padding: 14px;
+            border-radius: 8px;
+            margin-bottom: 14px;
+        }
+
+        .good {
+            background: #e4f7eb;
+            color: #15663b;
+        }
+
+        .warn {
+            background: #fff0ef;
+            color: #a52c2c;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 13px 20px;
+            border: 0;
+            border-radius: 8px;
+            background: #087a9b;
+            color: white;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .back {
+            background: #e3f1f7;
+            color: #087a9b;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .muted {
+            color: #6b8090;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        @@media(max-width:600px) {
+            .details {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                padding: 17px;
+            }
+        }
+
+        @@media print {
+            header, .no-print {
+                display: none;
+            }
+
+            body {
+                background: white;
+            }
+
+            .card {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>✚ eHealthCare</h1>
+        <p>QUẦY THU NGÂN — PHIẾU THANH TOÁN</p>
+    </header>
+    <main>
+        <div class="card">
+            <h2>THÔNG TIN VIỆN PHÍ</h2>
+            <div class="details">
+                <div><small>Mã lượt khám</small><strong>@Model.MaLuot</strong></div>
+                <div><small>Số thứ tự</small><strong>@Model.SoThuTu.ToString("D3")</strong></div>
+                <div><small>Bệnh nhân</small><strong>@Model.TenBenhNhan</strong></div>
+                <div><small>Ngày khám</small><strong>@Model.NgayKham.ToString("dd/MM/yyyy")</strong></div>
+                <div><small>Chuyên khoa</small><strong>@Model.TenKhoa</strong></div>
+                <div><small>Phương thức</small><strong>Tiền mặt</strong></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>CHI TIẾT CHI PHÍ</h2>
+            <div class="price"><span>Tiền khám</span><strong>@Model.TienKham.ToString("N0", vn) đ</strong></div>
+            <div style="margin:18px 0 8px; font-weight:bold;">Tiền thuốc</div>
+            @if (Model.Thuoc.Count > 0)
+            {
+                <table>
+                    <thead><tr><th>Tên thuốc</th><th class="right">SL</th><th class="right">Thành tiền</th></tr></thead>
+                    <tbody>
+                        @foreach (var thuoc in Model.Thuoc)
+                        {
+                            <tr>
+                                <td>@thuoc.TenThuoc</td>
+                                <td class="right">@thuoc.SoLuong</td>
+                                <td class="right">@thuoc.ThanhTien.ToString("N0", vn) đ</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p class="muted">Lượt khám này không có thuốc trong đơn.</p>
+            }
+            <div class="price"><span>Tổng tiền thuốc</span><strong>@Model.TienThuoc.ToString("N0", vn) đ</strong></div>
+            <div class="total"><span>TỔNG CẦN THU</span><span>@Model.TongTien.ToString("N0", vn) đ</span></div>
+            <p class="muted">Chi phí mô phỏng chưa khấu trừ BHYT vì hệ thống chưa xác minh quyền lợi bảo hiểm. Đơn giá dùng giá hiện có trong SQL và được lưu cố định khi xác nhận.</p>
+        </div>
+
+        <div class="card">
+            @if (TempData["ThongBaoThanhToan"] != null)
+            {
+                <div class="msg good">@TempData["ThongBaoThanhToan"]</div>
+            }
+            @if (TempData["LoiThanhToan"] != null)
+            {
+                <div class="msg warn">@TempData["LoiThanhToan"]</div>
+            }
+
+            @if (Model.MaThanhToan.HasValue)
+            {
+                <div class="msg good"><strong>ĐÃ THANH TOÁN</strong> — Mã biên nhận: #@Model.MaThanhToan</div>
+                <p>Ngày thu: @Model.NgayThanhToan.Value.ToString("dd/MM/yyyy HH:mm")</p>
+                <p>Nhân viên thu: @Model.TenThuNgan</p>
+                <div class="actions no-print"><button type="button" class="btn" onclick="window.print()">In biên nhận</button></div>
+            }
+            else if (Model.DonChuaPhat > 0)
+            {
+                <div class="msg warn">Còn @Model.DonChuaPhat đơn thuốc chưa phát (hoặc không có chi tiết). Vui lòng hoàn thành bước nhà thuốc trước khi thu tiền.</div>
+            }
+            else
+            {
+                <p><strong>Sẵn sàng thu tiền mặt.</strong> Hãy chỉ xác nhận sau khi đã thực sự nhận đủ số tiền hiển thị.</p>
+                <form method="post" action="@Url.Action("XacNhan", "ThuNgan")" class="no-print">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="maLuot" value="@Model.MaLuot" />
+                    <button type="submit" class="btn"
+                            onclick="return confirm('Đã nhận đủ tiền mặt và xác nhận thanh toán cho lượt khám này?');">
+                        Xác nhận đã thu tiền mặt
+                    </button>
+                </form>
+            }
+            <div class="actions no-print">
+                <a class="btn back" href="@Url.Action("DanhSach", "ThuNgan")">Quay lại danh sách thu ngân</a>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

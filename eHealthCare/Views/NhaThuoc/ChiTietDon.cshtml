@@ -1,0 +1,237 @@
+﻿@model eHealthCare.Controllers.NhaThuocChiTietModel
+@using System
+
+@{
+    ViewBag.Title = "Chi tiết đơn thuốc";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Chi tiết đơn thuốc - eHealthCare</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial,sans-serif;
+            background: #f1f6f8;
+            color: #263e51;
+        }
+
+        header {
+            background: #087a9b;
+            color: white;
+            padding: 24px 5%;
+        }
+
+            header h1 {
+                max-width: 1020px;
+                margin: auto;
+                font-size: 25px;
+            }
+
+        main {
+            max-width: 1020px;
+            width: 94%;
+            margin: 28px auto;
+        }
+
+        h2 {
+            color: #087a9b;
+            margin: 0 0 20px;
+        }
+
+        .card {
+            padding: 24px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 3px 14px rgba(0,0,0,.04);
+            margin-bottom: 18px;
+        }
+
+        .info {
+            display: grid;
+            grid-template-columns: repeat(2,1fr);
+            gap: 13px;
+        }
+
+            .info div {
+                padding: 13px;
+                background: #f3f8fb;
+                border-radius: 8px;
+            }
+
+            .info small {
+                display: block;
+                color: #687b8e;
+                margin-bottom: 6px;
+            }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            min-width: 790px;
+        }
+
+        th, td {
+            text-align: left;
+            border-bottom: 1px solid #e8eef3;
+            padding: 12px;
+            vertical-align: top;
+        }
+
+        th {
+            background: #e8f4f9;
+            color: #087a9b;
+        }
+
+        .table-scroll {
+            overflow-x: auto;
+        }
+
+        .message {
+            padding: 14px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .success {
+            background: #e5f8ee;
+            color: #1a6c3e;
+        }
+
+        .error {
+            background: #fff0ef;
+            color: #a32929;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 18px;
+            border-radius: 7px;
+            border: 0;
+            background: #087a9b;
+            color: #fff;
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .btn-green {
+            background: #178354;
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .note {
+            font-size: 13px;
+            color: #677f8e;
+            line-height: 1.6;
+        }
+
+        .check {
+            display: block;
+            margin: 14px 0 20px;
+            line-height: 1.5;
+        }
+
+            .check input {
+                width: 17px;
+                height: 17px;
+                vertical-align: middle;
+            }
+
+        @@media(max-width:650px) {
+            .info {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                padding: 17px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header><h1>✚ eHealthCare - NHÀ THUỐC</h1></header>
+    <main>
+        <p><a href="@Url.Action("DanhSachDon", "NhaThuoc")">← Quay lại danh sách đơn</a></p>
+        <section class="card">
+            <h2>CHI TIẾT ĐƠN THUỐC #@Model.MaDon</h2>
+            <div class="info">
+                <div><small>Mã lượt khám</small><strong>@Model.MaLuot</strong></div>
+                <div><small>Số thứ tự</small><strong>@Model.SoThuTu.ToString("D3")</strong></div>
+                <div><small>Bệnh nhân</small><strong>@Model.TenBenhNhan</strong></div>
+                <div><small>Bác sĩ phụ trách</small><strong>@Model.TenBacSi</strong></div>
+                <div><small>Chẩn đoán</small><strong>@Model.BenhChanDoan</strong></div>
+                <div><small>Trạng thái khám</small><strong>@Model.TrangThaiKham</strong></div>
+                <div><small>Trạng thái phát thuốc</small><strong>@Model.TrangThaiPhat</strong></div>
+                <div><small>Nhân viên phát</small><strong>@(string.IsNullOrWhiteSpace(Model.TenNhanVienPhat) ? "Chưa có" : Model.TenNhanVienPhat)</strong></div>
+            </div>
+        </section>
+        <section class="card">
+            <h2>THUỐC TRONG ĐƠN</h2>
+            <div class="table-scroll">
+                <table>
+                    <thead><tr><th>Thuốc</th><th>Số lượng</th><th>Sáng</th><th>Trưa</th><th>Chiều</th><th>Tối</th><th>Trước / Sau ăn</th></tr></thead>
+                    <tbody>
+                        @foreach (var t in Model.DanhSachThuoc)
+                        {
+                            <tr>
+                                <td>@t.TenThuoc</td>
+                                <td>@t.SoLuong</td>
+                                <td>@t.LieuSang</td>
+                                <td>@t.LieuTrua</td>
+                                <td>@t.LieuChieu</td>
+                                <td>@t.LieuToi</td>
+                                <td>@t.TruocHaySauAn</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            @if (Model.DanhSachThuoc.Count == 0)
+            {
+                <p class="note">Đơn này chưa có chi tiết thuốc.</p>
+            }
+        </section>
+        @if (TempData["ThongBaoPhat"] != null)
+        {
+            <div class="message success">@TempData["ThongBaoPhat"]</div>
+        }
+        @if (TempData["LoiPhat"] != null)
+        {
+            <div class="message error">@TempData["LoiPhat"]</div>
+        }
+        @if (Model.CoTheXacNhan)
+        {
+            <section class="card">
+                <h2>XÁC NHẬN CẤP PHÁT</h2>
+                <p class="note">Chỉ xác nhận sau khi nhân viên có thẩm quyền đã đối chiếu đầy đủ đơn thuốc, thuốc thực tế, số lượng, hạn dùng và người nhận. Không dùng thuốc mẫu để phát cho người thật.</p>
+                @using (Html.BeginForm("XacNhanPhat", "NhaThuoc", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="maDon" value="@Model.MaDon" />
+                    <label class="check"><input type="checkbox" name="daKiemTra" value="true" required /> Tôi đã kiểm tra và xác nhận việc cấp phát thuốc.</label>
+                    <button type="submit" class="btn btn-green" onclick="return confirm('Bạn xác nhận đã cấp phát thuốc cho đơn này?');">✓ Xác nhận đã phát thuốc</button>
+                }
+            </section>
+        }
+        else
+        {
+            <p class="note">Không thể xác nhận phát: đơn đã phát, lượt khám chưa hoàn tất, hoặc đơn chưa có thuốc.</p>
+        }
+        <div class="actions"><a class="btn" href="@Url.Action("DanhSachDon", "NhaThuoc")">Về danh sách đơn</a></div>
+    </main>
+</body>
+</html>

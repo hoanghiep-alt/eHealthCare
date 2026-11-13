@@ -1,0 +1,362 @@
+﻿
+@{
+    ViewBag.Title = "Đăng ký";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1" />
+
+    <title>Đăng ký - eHealthCare</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #eef5fa;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 25px 15px;
+        }
+
+        .register-box {
+            width: 500px;
+            max-width: 100%;
+            padding: 36px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 29px;
+            font-weight: bold;
+            color: #087a9b;
+        }
+
+        h2 {
+            text-align: center;
+            color: #20364b;
+            margin-bottom: 10px;
+        }
+
+        .description {
+            text-align: center;
+            color: #667788;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #34495e;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+            input:focus {
+                outline: none;
+                border-color: #087a9b;
+            }
+
+        .password-box {
+            position: relative;
+        }
+
+            .password-box input {
+                padding-right: 55px;
+            }
+
+        .btn-eye {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            padding: 8px;
+            font-size: 21px;
+            cursor: pointer;
+        }
+
+        .note {
+            color: #667788;
+            font-size: 12px;
+            margin-top: 6px;
+        }
+
+        .btn-register {
+            width: 100%;
+            background: #087a9b;
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+            .btn-register:hover {
+                background: #06637e;
+            }
+
+        .login-link {
+            text-align: center;
+            margin-top: 23px;
+            font-size: 14px;
+        }
+
+            .login-link a {
+                color: #087a9b;
+                font-weight: bold;
+                text-decoration: none;
+            }
+
+        .error {
+            background: #fff0ef;
+            color: #a52c2c;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 18px;
+        }
+
+        @@media (max-width: 480px) {
+            .register-box {
+                padding: 24px 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="register-box">
+
+        <div class="logo">✚ eHealthCare</div>
+
+        <h2>Đăng ký tài khoản</h2>
+
+        <p class="description">
+            Tạo tài khoản bệnh nhân để đặt lịch khám
+        </p>
+
+        @if (ViewBag.Error != null)
+        {
+            <div class="error">
+                @ViewBag.Error
+            </div>
+        }
+
+        <form id="registerForm"
+              method="post"
+              action="@Url.Action("Register", "Account")">
+
+            @Html.AntiForgeryToken()
+
+            <div class="form-group">
+
+                <label for="fullName">
+                    Họ và tên *
+                </label>
+
+                <input type="text"
+                       id="fullName"
+                       name="FullName"
+                       placeholder="Nhập họ và tên"
+                       maxlength="100"
+                       autocomplete="name"
+                       required />
+            </div>
+
+            <div class="form-group">
+
+                <label for="username">
+                    Tên đăng nhập *
+                </label>
+
+                <input type="text"
+                       id="username"
+                       name="TenDangNhap"
+                       placeholder="Ví dụ: nguyenvanan01"
+                       minlength="4"
+                       maxlength="30"
+                       pattern="[a-zA-Z0-9._]{4,30}"
+                       autocomplete="username"
+                       required />
+
+                <div class="note">
+                    Từ 4 đến 30 ký tự, không dấu,
+                    không khoảng trắng.
+                </div>
+
+            </div>
+
+            <div class="form-group">
+
+                <label for="phone">
+                    Số điện thoại *
+                </label>
+
+                <input type="tel"
+                       id="phone"
+                       name="PhoneNumber"
+                       placeholder="Nhập số điện thoại"
+                       inputmode="numeric"
+                       pattern="0[0-9]{9}"
+                       maxlength="10"
+                       autocomplete="tel"
+                       required />
+            </div>
+
+            <div class="form-group">
+
+                <label for="password">
+                    Mật khẩu *
+                </label>
+
+                <div class="password-box">
+
+                    <input type="password"
+                           id="password"
+                           name="Password"
+                           placeholder="Nhập mật khẩu"
+                           minlength="8"
+                           maxlength="128"
+                           autocomplete="new-password"
+                           required />
+
+                    <button type="button"
+                            class="btn-eye"
+                            onclick="togglePassword('password', this)"
+                            aria-label="Hiện mật khẩu">
+                        👁
+                    </button>
+
+                </div>
+
+                <div class="note">
+                    Mật khẩu phải có ít nhất 8 ký tự.
+                </div>
+            </div>
+
+            <div class="form-group">
+
+                <label for="confirmPassword">
+                    Xác nhận mật khẩu *
+                </label>
+
+                <div class="password-box">
+
+                    <input type="password"
+                           id="confirmPassword"
+                           name="ConfirmPassword"
+                           placeholder="Nhập lại mật khẩu"
+                           minlength="8"
+                           maxlength="128"
+                           autocomplete="new-password"
+                           required />
+
+                    <button type="button"
+                            class="btn-eye"
+                            onclick="togglePassword('confirmPassword', this)"
+                            aria-label="Hiện mật khẩu">
+                        👁
+                    </button>
+
+                </div>
+            </div>
+
+            <div id="clientError"
+                 class="error"
+                 style="display:none;"
+                 role="alert">
+            </div>
+
+            <button type="submit"
+                    class="btn-register">
+                Đăng ký tài khoản
+            </button>
+
+        </form>
+
+        <div class="login-link">
+            Đã có tài khoản?
+
+            <a href="@Url.Action("Login", "Account")">
+                Đăng nhập ngay
+            </a>
+        </div>
+
+    </div>
+
+    <script>
+        function togglePassword(inputId, button) {
+
+            var input =
+                document.getElementById(inputId);
+
+            if (input.type === "password") {
+                input.type = "text";
+                button.setAttribute(
+                    "aria-label", "Ẩn mật khẩu");
+            } else {
+                input.type = "password";
+                button.setAttribute(
+                    "aria-label", "Hiện mật khẩu");
+            }
+        }
+
+        document.getElementById("registerForm")
+            .addEventListener("submit", function (event) {
+
+                var password =
+                    document.getElementById("password").value;
+
+                var confirm =
+                    document.getElementById("confirmPassword").value;
+
+                var message =
+                    document.getElementById("clientError");
+
+                if (password !== confirm) {
+
+                    event.preventDefault();
+
+                    message.style.display = "block";
+                    message.textContent =
+                        "Mật khẩu xác nhận không khớp.";
+
+                } else {
+                    message.style.display = "none";
+                }
+            });
+    </script>
+
+</body>
+</html>

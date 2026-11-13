@@ -1,0 +1,241 @@
+﻿
+@{
+    ViewBag.Title = "Nhập thông tin BHYT";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1" />
+
+    <title>Bảo hiểm y tế - eHealthCare</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #edf5fa;
+            min-height: 100vh;
+            color: #243b53;
+        }
+
+        .header {
+            background: #087a9b;
+            color: white;
+            padding: 22px;
+            text-align: center;
+        }
+
+            .header h1 {
+                margin: 0;
+                font-size: 26px;
+            }
+
+            .header p {
+                margin: 8px 0 0;
+                font-size: 14px;
+            }
+
+        .container {
+            width: 500px;
+            max-width: calc(100% - 30px);
+            margin: 45px auto;
+            padding: 35px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.07);
+        }
+
+        h2 {
+            text-align: center;
+            color: #087a9b;
+            margin-top: 0;
+        }
+
+        .description {
+            text-align: center;
+            color: #667788;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 28px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+            input:focus {
+                outline: none;
+                border-color: #087a9b;
+            }
+
+        .btn-submit {
+            width: 100%;
+            background: #087a9b;
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+            .btn-submit:hover {
+                background: #06637e;
+            }
+
+        .error {
+            background: #fff0ef;
+            color: #a52c2c;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .success {
+            background: #e8f6ed;
+            color: #17663b;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .back {
+            display: block;
+            text-align: center;
+            margin-top: 22px;
+            color: #087a9b;
+            text-decoration: none;
+        }
+
+        .note {
+            font-size: 12px;
+            color: #667788;
+            text-align: center;
+            line-height: 1.5;
+            margin-top: 18px;
+        }
+
+        @@media (max-width: 480px) {
+            .container {
+                padding: 24px 20px;
+                margin-top: 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <h1>✚ eHealthCare</h1>
+        <p>Cổng đăng ký khám bệnh trực tuyến</p>
+    </header>
+
+    <div class="container">
+
+        <h2>Thông tin bảo hiểm y tế</h2>
+
+        <p class="description">
+            Vui lòng nhập thông tin trên thẻ
+            bảo hiểm y tế trước khi đăng ký khám bệnh.
+        </p>
+
+        @if (ViewBag.Error != null)
+        {
+            <div class="error">
+                @ViewBag.Error
+            </div>
+        }
+
+        @if (ViewBag.ThongBao != null)
+        {
+            <div class="success" role="status">
+                @ViewBag.ThongBao
+            </div>
+        }
+
+        <form method="post"
+              action="@Url.Action("NhapThe", "BaoHiem")">
+
+            @Html.AntiForgeryToken()
+
+            <div class="form-group">
+                <label for="soThe">
+                    Số thẻ / Mã số BHYT *
+                </label>
+
+                <input type="text"
+                       id="soThe"
+                       name="SoThe"
+                       placeholder="Nhập mã BHYT"
+                       maxlength="30"
+                       autocomplete="off"
+                       required />
+            </div>
+
+            <div class="form-group">
+                <label for="hoTen">
+                    Họ và tên trên thẻ *
+                </label>
+
+                <input type="text"
+                       id="hoTen"
+                       name="HoTen"
+                       placeholder="Nhập họ và tên"
+                       maxlength="100"
+                       required />
+            </div>
+
+            <div class="form-group">
+                <label for="ngaySinh">
+                    Ngày sinh *
+                </label>
+
+                <input type="date"
+                       id="ngaySinh"
+                       name="NgaySinh"
+                       required />
+            </div>
+
+            <button type="submit" class="btn-submit">
+                Lưu thông tin BHYT
+            </button>
+
+        </form>
+
+        <p class="note">
+            Đây là bước tiếp nhận thông tin để thử nghiệm.
+            Hệ thống chưa xác minh hiệu lực BHYT với BHXH.
+        </p>
+
+        <a class="back"
+           href="@Url.Action("Index", "Home")">
+            ← Quay lại trang chủ
+        </a>
+
+    </div>
+</body>
+</html>

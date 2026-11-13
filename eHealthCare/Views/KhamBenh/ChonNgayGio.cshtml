@@ -1,0 +1,334 @@
+﻿
+@using System
+
+@{
+    ViewBag.Title = "Chọn ngày giờ khám";
+    Layout = null;
+
+    string tenKhoa = Convert.ToString(
+        ViewBag.TenKhoa ?? "");
+
+    string tenBacSi = Convert.ToString(
+        ViewBag.TenBacSi ?? "");
+
+    string ngayDaChon = "";
+
+    if (Session["NgayKham"] is DateTime)
+    {
+        ngayDaChon =
+            ((DateTime)Session["NgayKham"])
+            .ToString("dd/MM/yyyy");
+    }
+
+    string gioDaChon =
+        Convert.ToString(Session["GioKham"] ?? "");
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1" />
+
+    <title>Chọn ngày giờ khám - eHealthCare</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #eef5fa;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            color: #243b53;
+        }
+
+        .header {
+            background: #087a9b;
+            color: white;
+            padding: 26px;
+            text-align: center;
+        }
+
+            .header h1 {
+                margin: 0;
+                font-size: 30px;
+            }
+
+            .header p {
+                margin: 10px 0 0;
+            }
+
+        .container {
+            max-width: 800px;
+            width: 94%;
+            margin: 40px auto;
+            background: white;
+            padding: 35px;
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+        }
+
+        h2 {
+            text-align: center;
+            color: #087a9b;
+            margin-top: 0;
+        }
+
+        .description {
+            text-align: center;
+            color: #667788;
+            margin-bottom: 30px;
+        }
+
+        .info {
+            background: #e9f7fb;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 28px;
+            line-height: 1.9;
+        }
+
+            .info p {
+                margin: 5px 0;
+            }
+
+        label {
+            display: block;
+            margin: 20px 0 10px;
+            font-weight: 600;
+        }
+
+        input[type="date"] {
+            width: 100%;
+            padding: 13px;
+            font-size: 16px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+        }
+
+        .time-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .time-option {
+            position: relative;
+        }
+
+            .time-option input {
+                position: absolute;
+                opacity: 0;
+            }
+
+            .time-option label {
+                display: block;
+                margin: 0;
+                padding: 14px 8px;
+                text-align: center;
+                border: 2px solid #dbe7ee;
+                border-radius: 8px;
+                cursor: pointer;
+                font-weight: 500;
+                background: white;
+            }
+
+            .time-option input:checked + label {
+                background: #087a9b;
+                color: white;
+                border-color: #087a9b;
+            }
+
+            .time-option input:focus-visible + label {
+                outline: 3px solid #1595e6;
+            }
+
+        .btn-submit {
+            width: 100%;
+            margin-top: 30px;
+            padding: 15px;
+            background: #087a9b;
+            border: none;
+            color: white;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+            .btn-submit:hover {
+                background: #06637e;
+            }
+
+        .success {
+            background: #e5f7ec;
+            color: #17663b;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            line-height: 1.7;
+        }
+
+        .error {
+            background: #fff0ef;
+            color: #a52c2c;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .note {
+            color: #667788;
+            font-size: 13px;
+            line-height: 1.6;
+            margin-top: 18px;
+        }
+
+        .back {
+            display: block;
+            text-align: center;
+            margin-top: 25px;
+            color: #087a9b;
+            text-decoration: none;
+        }
+
+        @@media (max-width: 600px) {
+            .container {
+                padding: 22px;
+                margin-top: 20px;
+            }
+
+            .time-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="header">
+        <h1>✚ eHealthCare</h1>
+        <p>Hệ thống đăng ký khám bệnh trực tuyến</p>
+    </header>
+
+    <main class="container">
+
+        <h2>CHỌN NGÀY VÀ GIỜ KHÁM</h2>
+
+        <p class="description">
+            Vui lòng lựa chọn thời gian khám phù hợp.
+        </p>
+
+        <div class="info">
+            <p>
+                <strong>Chuyên khoa:</strong> @tenKhoa
+            </p>
+
+            <p>
+                <strong>Bác sĩ:</strong> @tenBacSi
+            </p>
+        </div>
+
+        @if (ViewBag.Error != null)
+        {
+            <div class="error">
+                @ViewBag.Error
+            </div>
+        }
+
+        @if (ViewBag.ThongBao != null)
+        {
+            <div class="success">
+                <strong>@ViewBag.ThongBao</strong>
+
+                <p>
+                    Ngày yêu cầu: @ngayDaChon
+                </p>
+
+                <p>
+                    Giờ yêu cầu: @gioDaChon
+                </p>
+            </div>
+        }
+
+        @using (Html.BeginForm(
+            "ChonNgayGio",
+            "KhamBenh",
+            FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+
+            <label for="NgayKham">
+                Ngày khám *
+            </label>
+
+            <input type="date"
+                   id="NgayKham"
+                   name="NgayKham"
+                   required />
+
+            <label>
+                Chọn giờ khám *
+            </label>
+
+            <div class="time-grid">
+
+                @{
+                    string[] khungGio =
+                    {
+                        "07:00", "08:00",
+                        "09:00", "10:00",
+                        "13:00", "14:00",
+                        "15:00", "16:00"
+                    };
+                }
+
+                @foreach (string gio in khungGio)
+                {
+                    string id =
+                        "gio_" + gio.Replace(":", "");
+
+                    <div class="time-option">
+
+                        <input type="radio"
+                               name="GioKham"
+                               id="@id"
+                               value="@gio"
+                               required />
+
+                        <label for="@id">
+                            @gio
+                        </label>
+
+                    </div>
+                }
+
+            </div>
+
+            <p class="note">
+                Đây là các khung giờ để thử nghiệm
+                giao diện. Hệ thống chưa kiểm tra
+                lịch trực hoặc số chỗ còn trống
+                của bác sĩ.
+            </p>
+
+            <button type="submit"
+                    class="btn-submit">
+                Ghi nhận thời gian yêu cầu
+            </button>
+        }
+
+        <a class="back"
+           href="@Url.Action("ChonBacSi", "KhamBenh")">
+            ← Quay lại chọn bác sĩ
+        </a>
+
+    </main>
+
+</body>
+</html>
